@@ -93,7 +93,7 @@ server <- function(input,output,session){
     summary(datas())
   })
   
-  onclick("btn", info(date()))
+  
   
   output$plot <- renderPlot({
     
