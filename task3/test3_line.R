@@ -13,16 +13,13 @@ library(xlsx)
 library("reshape2")
 
 
-message("reading and loading of the dataset,\n this operation can take sometimes the datasets are very big.")
+message("reading and loading data from the dataset.")
 
 if(!exists("accidents")){
+  
   message("wrangling data...")
-  
-  
-  
-  
-  
-  file<-"EIS2019_databasev2.xlsx"
+
+  file<-"EIS2019_database.xlsx"
   sheetIndex<-3 
   df<-read.xlsx(file, sheetIndex, header=TRUE)
   
@@ -96,6 +93,8 @@ server <- function(input,output,session){
     summary(datas())
   })
   
+  onclick("btn", info(date()))
+  
   output$plot <- renderPlot({
     
 
@@ -104,25 +103,29 @@ server <- function(input,output,session){
     req(between(length(input$id), 1,100))
     
     g <- ggplot(data = newData, aes(y = newData[[as.name(selected_score)]], x=factor(Year) , label = round(newData[[as.name(selected_score)]]) , group=Country, color=Country )) 
-    g + geom_line() + geom_point() + theme_bw() + geom_text(size = 3, position=position_dodge(width=0.9), vjust=-0.25) + labs(x ="Year", y = input$sel_metric) #+ geom_smooth(method="lm") 
-      
-    
+    if(input$lm == "Show"){
+      g + geom_line() + geom_point() + theme_bw() + geom_text(size = 3, position=position_dodge(width=0.9), vjust=-0.25) + labs(x ="Year", y = input$sel_metric)  + geom_smooth(method="lm") 
+    }else{
+      g + geom_line() + geom_point() + theme_bw() + geom_text(size = 3, position=position_dodge(width=0.9), vjust=-0.25) + labs(x ="Year", y = input$sel_metric)
+    }
   })
 
 }
 
 ui <-basicPage(
   
-  titlePanel(title=h4("How does an innovation metric change over time, given a chosen location?", align="center")),
+  titlePanel(title=h4("How does an innovation parameter change over time, given a chosen location?", align="center")),
   sidebarPanel(
 
+    
     selectizeInput("id", "Select the Location", multiple = T, "Names", choices = "", options = list(maxItems = 12),  selected = 'Italy'),
 
     radioButtons("sel_metric", "Select the Metric",
                  c("Innovation Index", "Human Resources", "Research System", "Friendly Environment", "Finance", "Firm Investments",
                    "Innovators", "Linkages", "Intellectual Assets", "Employment Impact", "Sales Impact")),
+    radioButtons("lm", "Trend",
+                 c("Show", "Hide"))
 
-    
   ),
   mainPanel(plotOutput("plot"))
 )

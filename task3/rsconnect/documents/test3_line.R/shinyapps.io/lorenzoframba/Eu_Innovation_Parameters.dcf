@@ -1,0 +1,12 @@
+name: Eu_Innovation_Parameters
+title: Eu_Innovation_Parameters
+username:
+account: lorenzoframba
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3485436
+bundleId: 4112741
+url: https://lorenzoframba.shinyapps.io/Eu_Innovation_Parameters/
+when: 1610984564.86
+asMultiple: FALSE
+asStatic: FALSE
