@@ -12,7 +12,7 @@ df<-read.xlsx(file, sheetIndex, header=TRUE)
 cont <- subset(df, select=c("NA.","X2.2.1.R.D.expenditure.in.the.business.sector"))
 remove(df)
 colnames(cont) <- c("country", "RD")
-cont["RD"] <- round(cont["RD"])
+cont["RD"] <- round(cont["RD"], 1)
 
 # Loading geojson of Europe
 raw_eu <- rgdal::readOGR("Europe.geo.json", encoding = "UTF-8")
