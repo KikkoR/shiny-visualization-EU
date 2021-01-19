@@ -45,34 +45,66 @@ ui <- basicPage(
   
   headerPanel("Correlations with doctorate students"),
   
-  sidebarPanel ( 
-    selectInput('y','y-axis',ContVars, selected = "X1.1.1.New.doctorate.graduates")
-  ),
+ # sidebarPanel ( 
+    selectInput('y','y-axis',ContVars, selected = "X1.1.1.New.doctorate.graduates"),
+  #),
   
-  mainPanel(plotlyOutput(outputId = "myplot"))
+  #mainPanel(
+ #plotlyOutput(outputId = "myplot")
+ plotlyOutput(outputId = "myplot")
+ #)
 )
 
 # Server
 server <- function(input, output) {
 
   output$myplot <- renderPlotly({
-    ggplotly(
-      ggplot(df,aes(x=X1.1.1.New.doctorate.graduates,
-                    y=get(input$y),
-                    size= Summary.Innovation.Index, 
-                    color=location, 
-                    name=nation)) +
-      geom_point(alpha=0.8,stroke = 2) +
-      labs(x = "New doctorate graduates", y = names(ContVars[which(ContVars == input$y)]))+
-      scale_color_manual(name="Region",
-                        values=c("#984ea3","#377eb8","#4daf4a","#e41a1c"),
-                        labels=c("southern", "northern", "western", "eastern"))+
-      scale_size(range = c(0.01, 10), name="Innovation index"),
-      # scale_color_manual(values = c("#984ea3","#377eb8","#4daf4a","#e41a1c"),
-      #                    labels = c("southern", "northern", "western", "eastern"))+
-      #scale_y_continuous(labels = scales::percent),
-      tooltip = "name"
-    )%>% config(displayModeBar = F) 
+    # ggplotly(
+    #   ggplot(df,aes(x=X1.1.1.New.doctorate.graduates,
+    #                 y=get(input$y),
+    #                 size= Summary.Innovation.Index, 
+    #                 color=location, 
+    #                 name=nation)) +
+    #   geom_point(alpha=0.8,stroke = 2) +
+    #   labs(x = "New doctorate graduates", y = names(ContVars[which(ContVars == input$y)]))+
+    #   scale_color_manual(name="Region",
+    #                     values=c("#984ea3","#377eb8","#4daf4a","#e41a1c"),
+    #                     labels=c("southern", "northern", "western", "eastern"))+
+    #   scale_size(range = c(0.01, 10), name="Innovation index"),
+    #   # scale_color_manual(values = c("#984ea3","#377eb8","#4daf4a","#e41a1c"),
+    #   #                    labels = c("southern", "northern", "western", "eastern"))+
+    #   #scale_y_continuous(labels = scales::percent),
+    #   tooltip = "name"
+    # )%>% config(displayModeBar = F) 
+    
+     # r<-ggplot(df,aes(x=X1.1.1.New.doctorate.graduates,
+     #                  y=get(input$y),
+     #                size= Summary.Innovation.Index, 
+     #                color=location)) +
+     #  geom_point(alpha=0.8) +
+     #  labs(x = "New doctorate graduates", y = names(ContVars[which(ContVars == input$y)]))+
+     #  scale_size(range = c(0.01, 20), name="Innovation Index")+
+     #  scale_color_manual(values=c("#984ea3","#377eb8","#4daf4a","#e41a1c"))
+     # 
+     # 
+     # ggplotly(r)
+    
+    r<-ggplot(df,aes(x=X1.1.1.New.doctorate.graduates,
+                     y=get(input$y),
+                     size= Summary.Innovation.Index,
+                     color=location,
+                     name=nation)) +
+      geom_point(alpha=0.8) +
+      theme(legend.position="false")+
+      labs(x = "New doctorate graduates",y = names(ContVars[which(ContVars == input$y)]))+
+      scale_size(range = c(0.01, 13), name="Innovation Index")+
+      scale_color_manual(values=c("#984ea3","#377eb8","#4daf4a","#e41a1c"))
+    
+    r+theme(legend.title = element_blank()) 
+    
+    ggplotly(r,tooltip = "name")%>%layout(legend=list(x=1,y=0.5))%>% layout(legend=list(title=list(text='<b> REGION </b>'))) %>% config(displayModeBar = F)
+    
+    
   })  
   
 }
