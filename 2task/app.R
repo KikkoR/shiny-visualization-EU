@@ -15,6 +15,7 @@ cols <- names(df)[3:30]
 df[cols] <- lapply(df[cols], as.numeric)
 names(df)[1] <- "nation"
 
+
 ContVars <- c( "International scientific publications"="X1.2.1.International.scientific.co.publications",          
                "Scientific publications among top 10 most cited"="X1.2.2.Scientific.publications.among.top.10..most.cited",
                "Broadband penetration"="X1.3.1.Broadband.penetration", #not relevant
@@ -46,29 +47,42 @@ ui <- fluidPage(
   
   headerPanel("Correlations with doctorate students"),
   sidebarLayout(
-    sidebarPanel(selectInput('y','y-axis',ContVars, selected = "X1.1.1.New.doctorate.graduates"),),
+    sidebarPanel(selectInput('y','y-axis',ContVars, selected = "X1.1.1.New.doctorate.graduates"),radioButtons("lm", "Trend",
+                                                                                                              c("Show", "Hide"),selected = "Show")),
     mainPanel(uiOutput(outputId = "myplot"))
   )
 )
 
 # Server
 server <- function(input, output) {
-
+  
   output$myplot <- renderWithTooltips(
     
-    plot=ggplot(df,aes(x=X1.1.1.New.doctorate.graduates,
-                     y=get(input$y),
-                     size= Summary.Innovation.Index,
-                     color=Region,
-                     name=nation,
-                     )) +
-      geom_point(alpha=0.8) +
+   if(input$lm == "Hide"){p<-ggplot(df,aes(x=X1.1.1.New.doctorate.graduates,
+                       y=get(input$y)
+                       
+    ))+
+      geom_point(alpha=0.8,aes(size= Summary.Innovation.Index,
+                               color=Region,name=nation)) +
       labs(x = "New doctorate graduates",y = names(ContVars[which(ContVars == input$y)]))+
       scale_size(range = c(0.01, 13), name="Innovation Index",breaks = c(0.175,0.35,0.525,0.7))+
       scale_color_manual(values=c("#984ea3","#377eb8","#4daf4a","#e41a1c"))+
-      guides(color = guide_legend(override.aes = list(size = 2))),
+      guides(color = guide_legend(override.aes = list(size = 2)))}
+   else
+   {p<-ggplot(df,aes(x=X1.1.1.New.doctorate.graduates,
+                     y=get(input$y)
+                     
+   ))+
+     geom_point(alpha=0.8,aes(size= Summary.Innovation.Index,
+                              color=Region,name=nation)) +
+     labs(x = "New doctorate graduates",y = names(ContVars[which(ContVars == input$y)]))+
+     scale_size(range = c(0.01, 13), name="Innovation Index",breaks = c(0.175,0.35,0.525,0.7))+
+     scale_color_manual(values=c("#984ea3","#377eb8","#4daf4a","#e41a1c"))+
+     guides(color = guide_legend(override.aes = list(size = 2)))+geom_smooth()},
+
+
     
-    varDict = list(nation = "Nation", Summary.Innovation.Index = "Innovation index"),
+    varDict = list(nation = "Nation"),
     
     width=7,
     height=4
