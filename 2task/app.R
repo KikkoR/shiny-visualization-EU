@@ -2,12 +2,13 @@ library(shiny)
 library(tidyverse)
 library(xlsx)
 library(plotly)
+library(ggtips)
 file<-"EIS2019_database.xlsx"
 sheetIndex<-6 
 df<-read.xlsx(file, sheetIndex, header=TRUE)
 df$NA..1 <- as.factor(df$NA..1) 
 df = df[-1,]
-df$location<-factor(c("Western"," Eastern"," Eastern"," Northern","Western"," Northern","Western"," Southern"," Southern","Western"," Eastern"," Southern"," Southern"," Northern"," Northern","Western"," Eastern"," Southern","Western","Western"," Eastern"," Southern"," Eastern"," Eastern"," Eastern"," Northern"," Northern","Western"," Northern"," Eastern"," Eastern"," Northern"," Eastern","Western"," Southern"," Eastern"))
+df$Region<-factor(c("Western"," Eastern"," Eastern"," Northern","Western"," Northern","Western"," Southern"," Southern","Western"," Eastern"," Southern"," Southern"," Northern"," Northern","Western"," Eastern"," Southern","Western","Western"," Eastern"," Southern"," Eastern"," Eastern"," Eastern"," Northern"," Northern","Western"," Northern"," Eastern"," Eastern"," Northern"," Eastern","Western"," Southern"," Eastern"))
 df[ df == ":" ] <- NA
 df=na.omit(df)
 cols <- names(df)[3:30]
@@ -41,72 +42,37 @@ ContVars <- c( "International scientific publications"="X1.2.1.International.sci
 
 doctorate<-"X1.1.1.New.doctorate.graduates"
 # User Interface
-ui <- basicPage(
+ui <- fluidPage(
   
   headerPanel("Correlations with doctorate students"),
-  
- # sidebarPanel ( 
-    selectInput('y','y-axis',ContVars, selected = "X1.1.1.New.doctorate.graduates"),
-  #),
-  
-  #mainPanel(
- #plotlyOutput(outputId = "myplot")
- plotlyOutput(outputId = "myplot")
- #)
+  sidebarLayout(
+    sidebarPanel(selectInput('y','y-axis',ContVars, selected = "X1.1.1.New.doctorate.graduates"),),
+    mainPanel(uiOutput(outputId = "myplot"))
+  )
 )
 
 # Server
 server <- function(input, output) {
 
-  output$myplot <- renderPlotly({
-    # ggplotly(
-    #   ggplot(df,aes(x=X1.1.1.New.doctorate.graduates,
-    #                 y=get(input$y),
-    #                 size= Summary.Innovation.Index, 
-    #                 color=location, 
-    #                 name=nation)) +
-    #   geom_point(alpha=0.8,stroke = 2) +
-    #   labs(x = "New doctorate graduates", y = names(ContVars[which(ContVars == input$y)]))+
-    #   scale_color_manual(name="Region",
-    #                     values=c("#984ea3","#377eb8","#4daf4a","#e41a1c"),
-    #                     labels=c("southern", "northern", "western", "eastern"))+
-    #   scale_size(range = c(0.01, 10), name="Innovation index"),
-    #   # scale_color_manual(values = c("#984ea3","#377eb8","#4daf4a","#e41a1c"),
-    #   #                    labels = c("southern", "northern", "western", "eastern"))+
-    #   #scale_y_continuous(labels = scales::percent),
-    #   tooltip = "name"
-    # )%>% config(displayModeBar = F) 
+  output$myplot <- renderWithTooltips(
     
-     # r<-ggplot(df,aes(x=X1.1.1.New.doctorate.graduates,
-     #                  y=get(input$y),
-     #                size= Summary.Innovation.Index, 
-     #                color=location)) +
-     #  geom_point(alpha=0.8) +
-     #  labs(x = "New doctorate graduates", y = names(ContVars[which(ContVars == input$y)]))+
-     #  scale_size(range = c(0.01, 20), name="Innovation Index")+
-     #  scale_color_manual(values=c("#984ea3","#377eb8","#4daf4a","#e41a1c"))
-     # 
-     # 
-     # ggplotly(r)
-    
-    r<-ggplot(df,aes(x=X1.1.1.New.doctorate.graduates,
+    plot=ggplot(df,aes(x=X1.1.1.New.doctorate.graduates,
                      y=get(input$y),
                      size= Summary.Innovation.Index,
-                     color=location,
-                     name=nation)) +
+                     color=Region,
+                     name=nation,
+                     )) +
       geom_point(alpha=0.8) +
-      theme(legend.position="false")+
       labs(x = "New doctorate graduates",y = names(ContVars[which(ContVars == input$y)]))+
-      scale_size(range = c(0.01, 13), name="Innovation Index")+
-      scale_color_manual(values=c("#984ea3","#377eb8","#4daf4a","#e41a1c"))
+      scale_size(range = c(0.01, 13), name="Innovation Index",breaks = c(0.175,0.35,0.525,0.7))+
+      scale_color_manual(values=c("#984ea3","#377eb8","#4daf4a","#e41a1c"))+
+      guides(color = guide_legend(override.aes = list(size = 2))),
     
-    r+theme(legend.title = element_blank()) 
+    varDict = list(nation = "Nation", Summary.Innovation.Index = "Innovation index"),
     
-    ggplotly(r,tooltip = "name")%>%layout(legend=list(x=1,y=0.5))%>% layout(legend=list(title=list(text='<b> REGION </b>'))) %>% config(displayModeBar = F)
-    
-    
-  })  
-  
+    width=7,
+    height=4
+  )  
 }
 
 shinyApp(ui, server)
