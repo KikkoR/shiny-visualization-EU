@@ -66,16 +66,19 @@ server <- function(input,output,session){
   plotOutput("plot")
   
   datas<-reactive({
-    #req <-(input$id)
     
-    
+    validate(
+      need(input$id != "", 'Please choose at least one location to display the graph')
+    ) 
+
+    req <-(input$id)
+    req <-(input$sel_metric)
     ciao %>% filter(ciao$Country %in% input$id)  %>%  mutate(selected_score = input$sel_metric)  
   })
   
   observe({
     updateSelectInput(session, "sel_country",choices = a$df.NA.)
     updateSelectInput(session, "id",choices = a$df.NA.)
-    #updateSelectInput(session, 'sel_metric', choices = NULL)
   })
   
   observe({
@@ -103,12 +106,17 @@ server <- function(input,output,session){
     req(between(length(input$id), 1,100))
     
     g <- ggplot(data = newData, aes(y = newData[[as.name(selected_score)]], x=factor(Year) , label = round(newData[[as.name(selected_score)]]) , group=Country, color=Country )) 
+    
     if(input$lm == "Show"){
-      g + geom_line() + geom_point() + theme_bw() + geom_text(size = 3, position=position_dodge(width=0.9), vjust=-0.25) + labs(x ="Year", y = input$sel_metric)  + geom_smooth(method="lm") 
+      
+        g + geom_line() + geom_point() + theme_bw() + geom_text(size = 3, position=position_dodge(width=0.9), vjust=-0.25) + labs(x ="Year", y = input$sel_metric)  + geom_smooth(method="lm") 
+    
     }else{
-      g + geom_line() + geom_point() + theme_bw() + geom_text(size = 3, position=position_dodge(width=0.9), vjust=-0.25) + labs(x ="Year", y = input$sel_metric)
-    }
-  })
+      
+        g + geom_line() + geom_point() + theme_bw() + geom_text(size = 3, position=position_dodge(width=0.9), vjust=-0.25) + labs(x ="Year", y = input$sel_metric)
+        }
+  
+    })
 
 }
 
@@ -118,7 +126,7 @@ ui <-basicPage(
   sidebarPanel(
 
     
-    selectizeInput("id", "Select the Location", multiple = T, "Names", choices = "", options = list(maxItems = 12),  selected = 'Italy'),
+    selectizeInput("id", "Select the Location", multiple = T, "Names", choices = "", options = list(maxItems = 12),  selected = NULL),
 
     radioButtons("sel_metric", "Select the Metric",
                  c("Innovation Index", "Human Resources", "Research System", "Friendly Environment", "Finance", "Firm Investments",
