@@ -1,3 +1,5 @@
+#devtools::install_github("Roche/ggtips")
+
 library(shiny)
 library(tidyverse)
 library(xlsx)
@@ -41,49 +43,53 @@ ContVars <- c( "International scientific publications"="X1.2.1.International.sci
                "Sales of new to market and new to firm innovations"="X4.2.3.Sales.of.new.to.market.and.new.to.firm.innovations",
                "Summary Innovation Index"="Summary.Innovation.Index")  
 
-doctorate<-"X1.1.1.New.doctorate.graduates"
+
 # User Interface
 ui <- fluidPage(
   
-  headerPanel("Correlations with doctorate students"),
+  headerPanel("How do the different innovation performance metrics correlate with the number of new doctorate students in the different regions?"),
+  
   sidebarLayout(
-    sidebarPanel(selectInput('y','y-axis',ContVars, selected = "X1.1.1.New.doctorate.graduates"),radioButtons("lm", "Trend",
-                                                                                                              c("Show", "Hide"),selected = "Show")),
-    mainPanel(uiOutput(outputId = "myplot"))
+    sidebarPanel(selectInput('y','Select the metric',ContVars, selected = "X1.1.1.New.doctorate.graduates"),
+                radioButtons("lm", "Trend",c("Show", "Hide"),selected = "Show"),
+                checkboxGroupInput("region", "Regions", c("all"," Eastern", "Western"," Northern"," Southern"),selected = "all")
+                ),
+  mainPanel(uiOutput(outputId = "myplot"))
   )
 )
 
 # Server
 server <- function(input, output) {
-  
+ 
+  dat <- reactive({
+    validate(
+      need(input$region != "", 'Please choose at least one feature in the "Region" checkbox to display the graph')
+    )
+    mydf <- df
+    if(input$region != "all")
+      mydf <- subset(mydf,Region %in% input$region)
+    mydf
+  })
+   
   output$myplot <- renderWithTooltips(
     
-   if(input$lm == "Hide"){p<-ggplot(df,aes(x=X1.1.1.New.doctorate.graduates,
-                       y=get(input$y)
-                       
-    ))+
-      geom_point(alpha=0.8,aes(size= Summary.Innovation.Index,
-                               color=Region,name=nation)) +
+    if(input$lm == "Hide"){p<-ggplot(dat(),aes(x=X1.1.1.New.doctorate.graduates,y=get(input$y)))+
+      geom_point(alpha=0.8,aes(size= Summary.Innovation.Index, color=Region,name=nation)) +
       labs(x = "New doctorate graduates",y = names(ContVars[which(ContVars == input$y)]))+
       scale_size(range = c(0.01, 13), name="Innovation Index",breaks = c(0.175,0.35,0.525,0.7))+
       scale_color_manual(values=c("#984ea3","#377eb8","#4daf4a","#e41a1c"))+
-      guides(color = guide_legend(override.aes = list(size = 2)))}
-   else
-   {p<-ggplot(df,aes(x=X1.1.1.New.doctorate.graduates,
-                     y=get(input$y)
-                     
-   ))+
-     geom_point(alpha=0.8,aes(size= Summary.Innovation.Index,
-                              color=Region,name=nation)) +
+      guides(color = guide_legend(override.aes = list(size = 2)))
+    }
+    else{p<-ggplot(dat(),aes(x=X1.1.1.New.doctorate.graduates,y=get(input$y)))+
+     geom_point(alpha=0.8,aes(size= Summary.Innovation.Index,color=Region,name=nation)) +
      labs(x = "New doctorate graduates",y = names(ContVars[which(ContVars == input$y)]))+
      scale_size(range = c(0.01, 13), name="Innovation Index",breaks = c(0.175,0.35,0.525,0.7))+
      scale_color_manual(values=c("#984ea3","#377eb8","#4daf4a","#e41a1c"))+
-     guides(color = guide_legend(override.aes = list(size = 2)))+geom_smooth()},
+     guides(color = guide_legend(override.aes = list(size = 2)))+geom_smooth()
+    },
 
-
-    
     varDict = list(nation = "Nation"),
-    
+
     width=7,
     height=4
   )  

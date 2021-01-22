@@ -4,7 +4,7 @@ username:
 account: federicorodigari
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
-appId: 3495747
-bundleId: 4121813
+appId: 3502805
+bundleId: 4129200
 url: https://federicorodigari.shinyapps.io/2task/
-when: 1611154587.12347
+when: 1611312392.91204
