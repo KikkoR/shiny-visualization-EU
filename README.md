@@ -4,9 +4,9 @@ We decided to provide the answers, through the use of a 2019 open dataset called
 
 # How to execute
 The implementations are loaded to [shinyapps.io](https://www.shinyapps.io/) and could be accessed via: 
-- Question 1: [link 1](https://ostapkharysh.apps.io/MapVisualization)
-- Question 2: [link 2](https://federicorodigari.apps.io/2task/)
-- Question 3: [link 3](https://lorenzoframba.apps.io/Eu_Innovation_Parameters/)
+- Question 1: [link 1](https://ostapkharysh.shinyapps.io/MapVisualization/)
+- Question 2: [link 2](https://federicorodigari.shinyapps.io/2task/)
+- Question 3: [link 3](https://lorenzoframba.shinyapps.io/Eu_Innovation_Parameters/)
 
 For question 2, make sure to use Chrome in order to visualize the mouseover function that displays the name of the nations, because for some reasons, Safari doesn't seem to support Shiny at its fullest capabilities.
 
