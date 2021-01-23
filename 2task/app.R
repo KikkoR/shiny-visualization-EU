@@ -47,7 +47,9 @@ ContVars <- c( "International scientific publications"="X1.2.1.International.sci
 # User Interface
 ui <- fluidPage(
   
+
   headerPanel(h4("How do the different innovation performance metrics correlate with the number of new doctorate students in the different regions?")),
+
   
   sidebarLayout(
     sidebarPanel(selectInput('y','Select the metric',ContVars, selected = "X1.1.1.New.doctorate.graduates"),
