@@ -19,7 +19,7 @@ if(!exists("accidents")){
   
   message("wrangling data...")
 
-  file<-"EIS2019_database.xlsx"
+  file<-"../EIS2019_database.xlsx"
   sheetIndex<-3 
   df<-read.xlsx(file, sheetIndex, header=TRUE)
   
